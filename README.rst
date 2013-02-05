@@ -1,1 +1,1 @@
-PACKAGE_NAME whatever
+ella-wiki whatever

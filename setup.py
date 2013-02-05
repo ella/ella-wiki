@@ -20,14 +20,14 @@ test_requires = [
 ]
 
 setup(
-    name = 'PACKAGE_NAME',
-    description = "PACKAGE_NAME",
-    url = "https://github.com/ella/PACKAGE_NAME/",
+    name = 'ella-wiki',
+    description = "ella-wiki",
+    url = "https://github.com/ella/ella-wiki/",
     long_description = long_description,
     version = __versionstr__,
     author = "ella",
     author_email = "ella.project@gmail.com",
-    packages = ['APP_NAME'],
+    packages = ['ella_wiki'],
     zip_safe = False,
     include_package_data = True,
     classifiers = [
@@ -37,6 +37,6 @@ setup(
     ],
     install_requires=install_requires,
 
-    test_suite='test_APP_NAME.run_tests.run_all',
+    test_suite='test_ella_wiki.run_tests.run_all',
     test_requires=test_requires,
 )
