@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from ella.core.models import Publishable
 from ella.core.cache.utils import get_cached_object
 from ella.core.cache.fields import CachedForeignKey
+from ella.core.custom_urls import resolver
 from ella.utils.timezone import now
 
 from .conf import wiki_settings
@@ -40,9 +41,8 @@ class Submission(models.Model):
     content = models.TextField()
     user_comment = models.TextField(default='')
 
-    @models.permalink
     def get_absolute_url(self):
-        return 'wiki-submission', (), {'category': self.wiki.tree_path, 'id': self.pk}
+        return resolver.reverse(self.wiki, 'comments-list', id=self.pk)
 
     def set_live(self):
         self.wiki.submission = self
