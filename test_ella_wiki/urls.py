@@ -4,5 +4,6 @@ from django.contrib import admin
 
 urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^wiki/', include('ella_wiki.urls')),
     url(r'^', include('ella.core.urls')),
 ) + staticfiles_urlpatterns()

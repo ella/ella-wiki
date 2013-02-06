@@ -49,3 +49,5 @@ INSTALLED_APPS = (
 
     'ella_wiki',
 )
+
+WIKI_REDIS = {'db': 11}

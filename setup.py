@@ -13,6 +13,7 @@ f.close()
 install_requires = [
     'Django',
     'ella>=3.0.3',
+    'redis',
 ]
 test_requires = [
     'nose',
