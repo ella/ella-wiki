@@ -1,6 +1,8 @@
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.http import Http404
+from django.views.decorators.http import require_POST
+from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.template.response import TemplateResponse
+from django.shortcuts import redirect
 
 from ella.core.cache.utils import get_cached_object
 from ella.core import custom_urls
@@ -10,7 +12,7 @@ from ella.core.views import get_templates_from_publishable
 
 
 from .conf import wiki_settings
-from .models import redis, Wiki, REDIS_KEY
+from .models import redis, Wiki, REDIS_KEY, Submission
 
 mod_required = user_passes_test(wiki_settings.IS_MODERATOR_FUNC)
 
@@ -94,10 +96,37 @@ def edit(request, context):
 def add_child(request, context):
     pass
 
+@require_POST
 @mod_required
 def moderation(request, context, submission_id):
-    pass
+    try:
+        submission = context['object'].queue.get(pk=submission_id)
+    except Submission.DoesNotExist:
+        raise Http404()
+
+    if submission.status != submission.STATUS_PENDING:
+        return HttpResponseBadRequest()
+
+    submission.moderation_user = request.user
+    if request.POST.get('approve', False):
+        submission.approve(request.user)
+    else:
+        submission.reject(request.user)
+
+    if request.is_ajax():
+        return HttpResponse('{"error": false}', content_type="application/javascript")
+    return redirect(context['object'].get_absolute_url())
+
 
 def submission_detail(request, context, submission_id):
-    pass
+    try:
+        submission = context['object'].history.get(pk=submission_id)
+    except Submission.DoesNotExist:
+        raise Http404()
 
+    context['submission'] = submission
+    return TemplateResponse(
+            request,
+            get_templates_from_publishable('submission.html', context['object']),
+            context
+        )
