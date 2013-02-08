@@ -30,7 +30,7 @@ class Submission(models.Model):
         (STATUS_REJECTED, 'Rejected'),
     )
 
-    wiki = CachedForeignKey('Wiki')
+    wiki = CachedForeignKey('Wiki', related_name='submissions')
     submit_date = models.DateTimeField(default=now)
     user = CachedForeignKey(User, null=True, on_delete=models.SET_NULL)
     status = models.CharField(max_length=1, db_index=True,
@@ -59,6 +59,7 @@ class Submission(models.Model):
 class Wiki(Publishable):
     tree_parent = CachedForeignKey(Publishable, related_name='children')
 
+    submission = CachedForeignKey(Submission, related_name='published_in')
     content = models.TextField()
 
     tree_path = models.CharField(max_length=255, unique=True, editable=False)
@@ -66,6 +67,9 @@ class Wiki(Publishable):
     @models.permalink
     def get_absolute_url(self):
         return 'wiki-detail', (), {'category': self.tree_path}
+
+    def is_published(self):
+        return super(Wiki, self).is_published() and self.submission_id
 
     def delete(self):
         pipe = redis.pipeline()

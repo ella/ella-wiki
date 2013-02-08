@@ -64,6 +64,14 @@ def detail(request, category, url_remainder=''):
 def edit(request, context):
     pass
 
+@login_required
+def add_child(request, context):
+    pass
+
+@mod_required
+def child_queue(request, context):
+    pass
+
 @mod_required
 def queue(request, context):
     pass
