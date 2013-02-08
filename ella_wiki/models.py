@@ -71,6 +71,25 @@ class Wiki(Publishable):
     def is_published(self):
         return super(Wiki, self).is_published() and self.submission_id
 
+    def child_queue(self):
+        return Submission.objects.filter(
+                wiki__submission__isnull=True,
+                wiki__tree_parent=self,
+                status=Submission.STATUS_PENDING
+            ).order_by('submit_date')
+
+    def history(self):
+        return Submission.objects.filter(
+                wiki=self,
+                status=Submission.STATUS_APPROVED
+            ).order_by('-submit_date')
+
+    def queue(self):
+        return Submission.objects.filter(
+                wiki=self,
+                status=Submission.STATUS_PENDING
+            ).order_by('submit_date')
+
     def delete(self):
         pipe = redis.pipeline()
         pipe.delete(REDIS_KEY % self.tree_path)
