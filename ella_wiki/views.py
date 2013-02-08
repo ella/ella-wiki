@@ -59,6 +59,32 @@ def detail(request, category, url_remainder=''):
 
     return TemplateResponse(request, get_templates_from_publishable('object.html', wiki), context)
 
+from django.core.pagination import Paginator, InvalidPage
+
+# django generic views suck
+def get_paginated_view(attr_name, template_name, paginate_by=20):
+    def paginated_view(request, context):
+        qset = getattr(context['object'], attr_name)
+
+        paginator = Paginator(qset, paginate_by)
+        try:
+            page = paginator.page(request.GET.get('p', 1))
+        except InvalidPage:
+            raise Http404()
+        context.update({
+                'page': page,
+                'object_list': page.object_list,
+            })
+        return TemplateResponse(
+                request,
+                get_templates_from_publishable(template_name, context['object']),
+                context
+            )
+    return paginated_view
+
+child_queue = mod_required(get_paginated_view('child_queue', 'child_queue.html'))
+queue = mod_required(get_paginated_view('queue', 'queue.html'))
+history = get_paginated_view('history', 'history.html')
 
 @login_required
 def edit(request, context):
@@ -69,18 +95,7 @@ def add_child(request, context):
     pass
 
 @mod_required
-def child_queue(request, context):
-    pass
-
-@mod_required
-def queue(request, context):
-    pass
-
-@mod_required
 def moderation(request, context, submission_id):
-    pass
-
-def history(request, context):
     pass
 
 def submission_detail(request, context, submission_id):
