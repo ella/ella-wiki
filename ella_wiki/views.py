@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.decorators.http import require_POST
-from django.http import Http404, HttpResponse, HttpResponseBadRequest
+from django.http import Http404, HttpResponse
 from django.template.response import TemplateResponse
 from django.shortcuts import redirect
 
@@ -13,6 +13,7 @@ from ella.core.views import get_templates_from_publishable
 
 from .conf import wiki_settings
 from .models import redis, Wiki, REDIS_KEY, Submission
+from .forms import WikiForm, SubmissionForm
 
 mod_required = user_passes_test(wiki_settings.IS_MODERATOR_FUNC)
 
@@ -90,11 +91,52 @@ history = get_paginated_view('history', 'history.html')
 
 @login_required
 def edit(request, context):
-    pass
+    data = None
+    if request.method == 'POST':
+        data = request.POST
+    form = SubmissionForm(context['object'], request.user, data)
+    if form.is_valid():
+        submission = form.save()
+        # pre-approve moderator submissions
+        if wiki_settings.IS_MODERATOR_FUNC(request.user):
+            submission.approve(request.user)
+        return redirect(context['object'])
+
+    context['form'] = form
+    return TemplateResponse(
+            request,
+            get_templates_from_publishable('submission_form.html', context['object']),
+            context
+        )
 
 @login_required
 def add_child(request, context):
-    pass
+    data = None
+    if request.method == 'POST':
+        data = request.POST
+
+    wiki = None
+    wform = WikiForm(context['object'], data)
+    if wform.is_valid():
+        wiki = wform.save(commit=False)
+
+    sform = SubmissionForm(wiki, request.user, data)
+    if sform.is_valid() and wform.is_valid():
+        wiki.save()
+        submission = sform.save()
+        # pre-approve moderator submissions
+        if wiki_settings.IS_MODERATOR_FUNC(request.user):
+            submission.approve(request.user)
+            return redirect(wiki)
+        return redirect(context['object'])
+
+    context['wiki_form'] = wform
+    context['submission_form'] = sform
+    return TemplateResponse(
+            request,
+            get_templates_from_publishable('child_form.html', context['object']),
+            context
+        )
 
 @require_POST
 @mod_required
@@ -113,7 +155,7 @@ def moderation(request, context, submission_id):
     if request.is_ajax():
         return HttpResponse('{"error": false}', content_type="application/javascript")
 
-    return redirect(submission.get_absolute_url())
+    return redirect(submission)
 
 def submission_detail(request, context, submission_id):
     try:
