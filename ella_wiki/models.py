@@ -42,7 +42,12 @@ class Submission(models.Model):
     user_comment = models.TextField(default='')
 
     def get_absolute_url(self):
-        return resolver.reverse(self.wiki, 'comments-list', id=self.pk)
+        if self.status == self.STATUS_APPROVED:
+            return resolver.reverse(self.wiki, 'wiki-submission', id=self.pk)
+        elif self.status == self.STATUS_PENDING:
+            return resolver.reverse(self.wiki, 'wiki-queue')
+        else:
+            return self.wiki.get_absolute_url()
 
     def approve(self, user):
         self.moderation_user = user

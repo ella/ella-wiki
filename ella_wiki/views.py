@@ -104,9 +104,6 @@ def moderation(request, context, submission_id):
     except Submission.DoesNotExist:
         raise Http404()
 
-    if submission.status != submission.STATUS_PENDING:
-        return HttpResponseBadRequest()
-
     submission.moderation_user = request.user
     if request.POST.get('approve', False):
         submission.approve(request.user)
@@ -115,8 +112,8 @@ def moderation(request, context, submission_id):
 
     if request.is_ajax():
         return HttpResponse('{"error": false}', content_type="application/javascript")
-    return redirect(context['object'].get_absolute_url())
 
+    return redirect(submission.get_absolute_url())
 
 def submission_detail(request, context, submission_id):
     try:
