@@ -1,10 +1,8 @@
 from django.conf.urls.defaults import patterns, url
 
 from ella.core.urls import res
-from ella.core.custom_urls import resolver
 
 from .views import detail, queue, submission_detail, edit, history, moderation, add_child, child_queue
-from .models import Wiki
 
 urlpatterns = patterns('',
     url('^%(cat)s/%(rest)s$' % res, detail, name='wiki-custom-urls'),
@@ -22,4 +20,3 @@ custom_url_patterns = patterns('',
     url('^history/$', history, name='wiki-history'),
     url('^history/%(id)s/$', submission_detail, name='wiki-submission'),
 )
-resolver.register(custom_url_patterns, model=Wiki)

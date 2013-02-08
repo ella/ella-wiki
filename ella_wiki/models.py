@@ -57,9 +57,9 @@ class Submission(models.Model):
 
 
 class Wiki(Publishable):
-    tree_parent = CachedForeignKey(Publishable, related_name='children')
+    tree_parent = CachedForeignKey(Publishable, related_name='children', null=True, blank=True)
 
-    submission = CachedForeignKey(Submission, related_name='published_in')
+    submission = CachedForeignKey(Submission, related_name='published_in', null=True, blank=True)
     content = models.TextField()
 
     tree_path = models.CharField(max_length=255, unique=True, editable=False)
