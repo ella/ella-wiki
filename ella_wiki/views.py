@@ -3,6 +3,7 @@ from django.views.decorators.http import require_POST
 from django.http import Http404, HttpResponse
 from django.template.response import TemplateResponse
 from django.shortcuts import redirect
+from django.core.paginator import Paginator, InvalidPage
 
 from ella.core.cache.utils import get_cached_object
 from ella.core import custom_urls
@@ -61,8 +62,6 @@ def detail(request, category, url_remainder=''):
     object_rendered.send(sender=Wiki, request=request, category=wiki.category, publishable=wiki)
 
     return TemplateResponse(request, get_templates_from_publishable('object.html', wiki), context)
-
-from django.core.pagination import Paginator, InvalidPage
 
 # django generic views suck
 def get_paginated_view(attr_name, template_name, paginate_by=20):
