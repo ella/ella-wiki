@@ -1,8 +1,21 @@
 from django.template import TemplateDoesNotExist
 
+from ella_wiki.models import Wiki
+
 from unittest import TestCase
 
 from nose import tools
+
+def create_wiki(case, commit=True, **kwargs):
+    defaults = dict(
+        slug='first-article',
+        category=case.category,
+    )
+    defaults.update(kwargs)
+    wiki = Wiki(**defaults)
+    if commit:
+        wiki.save()
+    return wiki
 
 
 class TemplateLoader(object):
