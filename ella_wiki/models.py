@@ -49,23 +49,21 @@ class Submission(models.Model):
         else:
             return self.wiki.get_absolute_url()
 
-    def approve(self, user):
+    def approve(self, user=None):
         self.moderation_user = user
         self.moderation_date = now()
         self.status = self.STATUS_APPROVED
-        self.save(force_update=True)
-        self.set_live()
+        self.save()
+
+        self.wiki.submission = self
+        self.wiki.content = self.content
+        self.wiki.save(force_update=True)
 
     def reject(self, user):
         self.moderation_user = user
         self.moderation_date = now()
         self.status = self.STATUS_REJECTED
         self.save(force_update=True)
-
-    def set_live(self):
-        self.wiki.submission = self
-        self.wiki.content = self.content
-        self.wiki.save(force_update=True)
 
     def get_by_tree_path(self, tree_path):
         pk = redis.get(REDIS_KEY % tree_path)

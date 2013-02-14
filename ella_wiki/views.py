@@ -52,7 +52,7 @@ def detail(request, category, url_remainder=''):
 
     # custom urls
     if leftover or url_remainder:
-        url_remainder = ('%s/%s' % (leftover, url_remainder)). strip('/')
+        url_remainder = ('%s/%s' % (leftover, url_remainder)). strip('/') + '/'
         return custom_urls.resolver.call_custom_view(request, wiki, url_remainder, context)
 
     # ella API
@@ -71,7 +71,7 @@ def detail(request, category, url_remainder=''):
 # django generic views suck
 def get_paginated_view(attr_name, template_name, paginate_by=20):
     def paginated_view(request, context):
-        qset = getattr(context['object'], attr_name)
+        qset = getattr(context['object'], attr_name)()
 
         paginator = Paginator(qset, paginate_by)
         try:

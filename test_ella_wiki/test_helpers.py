@@ -16,11 +16,11 @@ def create_submission(case, commit=True, publish=True, **kwargs):
         defaults['wiki'] = create_wiki(case, commit, **kwargs.pop('wiki_kwargs', {}))
     defaults.update(kwargs)
     submission = Submission(**defaults)
-    if commit:
-        submission.save()
 
     if publish:
-        submission.set_live()
+        submission.approve()
+    elif commit:
+        submission.save()
 
     return submission
 
