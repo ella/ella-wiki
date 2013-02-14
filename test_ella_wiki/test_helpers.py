@@ -1,15 +1,35 @@
 from django.template import TemplateDoesNotExist
 
-from ella_wiki.models import Wiki
+from ella.utils.test_helpers import default_time
+
+from ella_wiki.models import Wiki, Submission
 
 from unittest import TestCase
 
 from nose import tools
 
+def create_submission(case, commit=True, publish=True, **kwargs):
+    defaults = dict(
+        content='I am a wiki!',
+    )
+    if 'wiki' not in kwargs:
+        defaults['wiki'] = create_wiki(case, commit, **kwargs.pop('wiki_kwargs', {}))
+    defaults.update(kwargs)
+    submission = Submission(**defaults)
+    if commit:
+        submission.save()
+
+    if publish:
+        submission.set_live()
+
+    return submission
+
 def create_wiki(case, commit=True, **kwargs):
     defaults = dict(
         slug='first-article',
         category=case.category,
+        published=True,
+        publish_from=default_time,
     )
     defaults.update(kwargs)
     wiki = Wiki(**defaults)

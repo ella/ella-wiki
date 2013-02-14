@@ -35,6 +35,11 @@ def detail(request, category, url_remainder=''):
     # get the last ID == the most specific wiki object
     id = filter(None, ids)[-1]
     wiki = get_cached_object(Wiki, pk=id)
+
+    if not (wiki.is_published() or wiki_settings.IS_MODERATOR_FUNC(request.user)):
+        # future publish, render if accessed by moderator
+        raise Http404()
+
     # treat the rest as part of custom_urls part
     leftover = category[len(wiki.tree_path):]
 

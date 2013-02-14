@@ -5,8 +5,8 @@ from ella.core.urls import res
 from .views import detail, queue, submission_detail, edit, history, moderation, add_child, child_queue
 
 urlpatterns = patterns('',
-    url('^%(cat)s/%(rest)s$' % res, detail, name='wiki-custom-urls'),
     url('^%(cat)s/$' % res, detail, name='wiki-detail'),
+    url('^%(cat)s/%(rest)s$' % res, detail, name='wiki-custom-urls'),
 )
 
 custom_url_patterns = patterns('',

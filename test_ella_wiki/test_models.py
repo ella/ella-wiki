@@ -4,7 +4,7 @@ from ella.utils.test_helpers import create_basic_categories
 
 from nose import tools
 
-from .test_helpers import create_wiki
+from .test_helpers import create_wiki, create_submission
 
 class TestWikiModel(TestCase):
     def setUp(self):
@@ -20,3 +20,11 @@ class TestWikiModel(TestCase):
 
         tools.assert_equals('/wiki/first-article/', wiki.get_absolute_url())
         tools.assert_equals('/wiki/first-article/second/', wiki2.get_absolute_url())
+
+    def test_wiki_with_no_submission_is_unpublished(self):
+        wiki = create_wiki(self, slug='first-article')
+        tools.assert_false(wiki.is_published())
+
+    def test_wiki_with_submission_is_published(self):
+        submission = create_submission(self)
+        tools.assert_true(submission.wiki.is_published())
