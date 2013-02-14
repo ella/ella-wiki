@@ -59,7 +59,7 @@ class Submission(models.Model):
         self.wiki.content = self.content
         self.wiki.save(force_update=True)
 
-    def reject(self, user):
+    def reject(self, user=None):
         self.moderation_user = user
         self.moderation_date = now()
         self.status = self.STATUS_REJECTED
