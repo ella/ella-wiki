@@ -35,9 +35,9 @@ class Submission(models.Model):
     user = CachedForeignKey(User, null=True, on_delete=models.SET_NULL)
     status = models.CharField(max_length=1, db_index=True,
                               choices=STATUS_CHOICES, default=STATUS_PENDING)
-    moderation_user = CachedForeignKey(User, null=True, on_delete=models.SET_NULL,
-                                           related_name='moderated_submissions')
-    moderation_date = models.DateTimeField(null=True)
+    moderation_user = CachedForeignKey(User, null=True, blank=True,
+                    on_delete=models.SET_NULL, related_name='moderated_submissions')
+    moderation_date = models.DateTimeField(null=True, blank=True)
     content = models.TextField()
     user_comment = models.TextField(default='')
 
